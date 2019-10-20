@@ -1,12 +1,16 @@
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <cxcore.h>
 #include <highgui.h>
 #include <stdlib.h>
 #include <cmath>
-#include <conio.h>
 #include <iostream>
 #include <stack>
 #include <iterator>
+
+#if defined(_WIN32)
+#include <conio.h>
+#endif
+
 
 #include "Image.h"
 

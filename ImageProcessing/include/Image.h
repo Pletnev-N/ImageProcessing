@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <highgui.h>
 
 
@@ -48,7 +48,7 @@ protected:
 class BGRImage : public Image
 {
 public:
-    
+
     BGRImage();
     BGRImage(int rows, int cols, std::string name);
 
