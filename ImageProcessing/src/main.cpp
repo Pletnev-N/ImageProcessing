@@ -6,36 +6,40 @@
 #include <iostream>
 #include <stack>
 #include <iterator>
+#include "noise.h"
 
 #if defined(_WIN32)
 #include <conio.h>
 #endif
 
-
-#include "Image.h"
-
-
 //arg 1 - source image file
 int main(int argc, char **argv)
 {
-    if (argc == 1)
-    {
-        return -1;
-    }
+  cv::Mat image;
 
-    BGRImage image_orig;
-    image_orig.open_file(argv[1]);
+  if (argc != 2) {
+    std::cerr << "Please provide input file name." << std::endl;
+    return 1;
+  }
 
-    GrayImage image_gray;
-    image_gray.open_file(argv[1]);
-    image_gray.set_name("Gray");
+  // 1:
+  image = cv::imread(argv[1]);
 
-    BGRImage red_channel = image_orig.get_channel_image(R);
+  if (image.empty()) {
+    std::cerr << "Could not read the image." << std::endl;
+    return 2;
+  }
 
-    image_orig.show();
-    image_gray.show();
-    red_channel.show();
+  cv::imshow("1. Original (press any key to continue)", image);
+  cv::waitKey();
 
-    cvWaitKey();
-    return 0;
+  cv::Mat gray;
+  cv::cvtColor(image, gray, CV_BGR2GRAY);
+  cv::imshow("3. Gray (press any key to continue)", gray);
+  cv::waitKey();
+
+  cv::Mat noisy = withRayleighNoise(gray, 0.0004);
+  cv::imshow("3. Noisy (Rayleigh) (press any key to continue)", noisy);
+  cv::waitKey();
+
 }
