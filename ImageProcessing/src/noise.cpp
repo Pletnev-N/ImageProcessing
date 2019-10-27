@@ -17,18 +17,26 @@ double RayleighDistribution::operator()(Generator& g) {
   return std::sqrt(-std::log(1 - cdf) / (2*sigmaSq));
 }
 
-cv::Mat withRayleighNoise(const cv::Mat& in, double sigmaSq) {
+cv::Mat withRayleighNoise(const cv::Mat& in, double sigmaSq, uint noiseHist[256]) {
   cv::Mat out = in;
 
   std::random_device rd;
   std::mt19937 gen(rd());
   RayleighDistribution dist(sigmaSq);
 
-  out.forEach<uchar>([&dist,&gen](uchar& value, const int pos[]) -> void {
+  std::fill(noiseHist, noiseHist + 256, 0U);
+
+  out.forEach<uchar>([&dist, &gen, noiseHist](uchar& value, const int pos[])
+  -> void {
     uchar noise = static_cast<uchar>(dist(gen));
+    noiseHist[noise]++;
     value = std::clamp(noise + value, 0, 255);
   });
   std::cout << std::endl;
+
+  for (size_t i = 0; i < 256; ++i) {
+    noiseHist[i] = noiseHist[i];
+  }
 
   return out;
 }

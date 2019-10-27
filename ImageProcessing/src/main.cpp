@@ -7,6 +7,8 @@
 #include <stack>
 #include <iterator>
 #include "noise.h"
+#include "filters.h"
+#include "utils.h"
 
 #if defined(_WIN32)
 #include <conio.h>
@@ -31,15 +33,45 @@ int main(int argc, char **argv)
   }
 
   cv::imshow("1. Original (press any key to continue)", image);
-  cv::waitKey();
+  // cv::waitKey();
 
   cv::Mat gray;
   cv::cvtColor(image, gray, CV_BGR2GRAY);
   cv::imshow("3. Gray (press any key to continue)", gray);
-  cv::waitKey();
+  // cv::waitKey();
 
-  cv::Mat noisy = withRayleighNoise(gray, 0.0004);
+
+  uint noiseHist[256];
+  cv::Mat noisy = withRayleighNoise(gray, 0.004, noiseHist);
   cv::imshow("3. Noisy (Rayleigh) (press any key to continue)", noisy);
+  // cv::waitKey();
+
+  for (size_t i = 0; i < 256; ++i) {
+    for (size_t j = 0; j < noiseHist[i] >> 7; ++j) {
+      std::cout << '*';
+    }
+    std::cout << std::endl;
+
+  }
+
+  uchar v = 10U;
+  const cv::Mat kernel = (cv::Mat_<uchar>(3, 3) <<
+    v, v, v, v, v,
+    v, v, v, v, v,
+    v, v, v, v, v,
+    v, v, v, v, v,
+    v, v, v, v, v);
+
+  cv::Mat filtered = morphOpening(noisy, kernel);
+  cv::imshow("4. Morphological Opening (press any key to continue)", filtered);
+
+  cv::Mat blured;
+  cv::GaussianBlur(gray, blured, cv::Size(3, 3), 2.5);
+  cv::imshow("5. Gaussian Blur (press any key to continue)", blured);
+
+  std::cout << "SSIM(filtered, gray) = " << getMSSIM(filtered, gray) << std::endl;
+  std::cout << "SSIM(blured, gray) = " << getMSSIM(blured, gray) << std::endl;
+
   cv::waitKey();
 
 }
