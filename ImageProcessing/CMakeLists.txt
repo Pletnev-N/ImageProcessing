@@ -13,8 +13,8 @@ include_directories(include ${OpenCV_INCLUDE_DIRS})
 
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(SOURCES src/main.cpp src/noise.cpp)
-set(HEADERS include/noise.h)
+set(SOURCES src/main.cpp src/noise.cpp src/filters.cpp src/utils.cpp)
+set(HEADERS include/noise.h include/filters.h include/utils.h)
 
 add_executable(ImageProcessing ${SOURCES} ${HEADERS})
 target_link_libraries(ImageProcessing PUBLIC ${OpenCV_LIBS})
