@@ -53,3 +53,36 @@ cv::Mat morphOpening(const cv::Mat& in, const cv::Mat& kernel) {
   cv::Mat t = erosion(in, kernel);
   return dilation(t, kernel);
 }
+
+
+cv::Mat MedianFilter(const cv::Mat& mat, int radius)
+{
+    cv::Mat res = mat.clone();
+
+    for (int i = 0; i < mat.rows; i++)
+        for (int j = 0; j < mat.cols; j++)
+        {
+            std::vector<uchar> windows_pixels;
+            uchar median;
+
+            for (int k = -radius; k <= radius; k++)
+                for (int l = -radius; l <= radius; l++)
+                {
+                    windows_pixels.push_back(mat.at<uchar>(std::clamp(i + k, 0, mat.rows - 1), std::clamp(j + l, 0, mat.cols - 1)));
+                }
+            
+            std::sort(windows_pixels.begin(), windows_pixels.end());
+            if (windows_pixels.size() % 2 == 0)
+            {
+                median = (windows_pixels[windows_pixels.size() / 2 - 1] + windows_pixels[windows_pixels.size() / 2]) / 2;
+            }
+            else
+            {
+                median = windows_pixels[windows_pixels.size() / 2];
+            }
+
+            res.at<uchar>(i, j) = median;
+        }
+
+    return res;
+}

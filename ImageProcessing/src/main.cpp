@@ -10,44 +10,54 @@
 
 
 
-void rayleigh_opening(cv::Mat image)
+void lab1(const cv::Mat& image)
 {
-    cv::Mat gray;
-    cv::cvtColor(image, gray, CV_BGR2GRAY);
-    cv::imshow("3. Gray (press any key to continue)", gray);
-    // cv::waitKey();
-
-
     uint noiseHist[256];
-    cv::Mat noisy = withRayleighNoise(gray, 0.004, noiseHist);
-    cv::imshow("3. Noisy (Rayleigh) (press any key to continue)", noisy);
+    cv::Mat rayleigh = withRayleighNoise(image, 0.004, noiseHist);
+    cv::imshow("Rayleigh Noise", rayleigh);
     // cv::waitKey();
 
-    for (size_t i = 0; i < 256; ++i) {
-        for (size_t j = 0; j < noiseHist[i] >> 7; ++j) {
-            std::cout << '*';
-        }
-        std::cout << std::endl;
+    //for (size_t i = 0; i < 256; ++i) {
+    //    for (size_t j = 0; j < noiseHist[i] >> 7; ++j) {
+    //        std::cout << '*';
+    //    }
+    //    std::cout << std::endl;
 
-    }
+    //}
 
     uchar v = 10U;
-    const cv::Mat kernel = (cv::Mat_<uchar>(5, 5) <<
-        v, v, v, v, v,
-        v, v, v, v, v,
-        v, v, v, v, v,
-        v, v, v, v, v,
-        v, v, v, v, v);
+    const cv::Mat kernel = (cv::Mat_<uchar>(3, 3) <<
+        v, v, v,
+        v, v, v,
+        v, v, v);
 
-    cv::Mat filtered = morphOpening(noisy, kernel);
-    cv::imshow("4. Morphological Opening (press any key to continue)", filtered);
+    cv::Mat opening = morphOpening(rayleigh, kernel);
+    cv::imshow("Morphological Opening (press any key to continue)", opening);
 
-    cv::Mat blured;
-    cv::GaussianBlur(gray, blured, cv::Size(3, 3), 2.5);
-    cv::imshow("5. Gaussian Blur (press any key to continue)", blured);
+    cv::Mat rayleigh_blured;
+    cv::GaussianBlur(rayleigh, rayleigh_blured, cv::Size(3, 3), 2.5);
+    cv::imshow("Gaussian Blur for Rayleigh Noise", rayleigh_blured);
 
-    std::cout << "SSIM(filtered, gray) = " << getMSSIM(filtered, gray) << std::endl;
-    std::cout << "SSIM(blured, gray) = " << getMSSIM(blured, gray) << std::endl;
+
+    cv::Mat gamma;
+    gamma = GammaNoise(image, 2.0, 5.0);
+    cv::imshow("Gamma Noise", gamma);
+
+    cv::Mat median;
+    median = MedianFilter(gamma, 1);
+    cv::imshow("Median Filter", median);
+
+    cv::Mat gamma_blured;
+    cv::GaussianBlur(gamma, gamma_blured, cv::Size(3, 3), 2.5);
+    cv::imshow("Gaussian Blur for Gamma Noise", gamma_blured);
+
+
+    std::cout << "SSIM(Rayleigh noise, gray) = " << getMSSIM(rayleigh, image) << std::endl;
+    std::cout << "SSIM(Morphological opening, gray) = " << getMSSIM(opening, image) << std::endl;
+    std::cout << "SSIM(Gaussian blur (Rayleigh noise), gray) = " << getMSSIM(rayleigh_blured, image) << std::endl;
+    std::cout << "SSIM(Gamma noise, gray) = " << getMSSIM(gamma, image) << std::endl;
+    std::cout << "SSIM(Median filter, gray) = " << getMSSIM(median, image) << std::endl;
+    std::cout << "SSIM(Gaussian blur (Gamma noise), gray) = " << getMSSIM(gamma_blured, image) << std::endl;
 }
 
 
@@ -70,12 +80,13 @@ int main(int argc, char **argv)
     return 2;
   }
 
-  cv::imshow("1. Original (press any key to continue)", image);
-  // cv::waitKey();
+  //cv::imshow("Original (press any key to continue)", image);
 
+  cv::Mat gray;
+  cv::cvtColor(image, gray, CV_BGR2GRAY);
+  cv::imshow("Gray (press any key to continue)", gray);
 
-  rayleigh_opening(image);
-
+  lab1(gray);
 
   cv::waitKey();
 

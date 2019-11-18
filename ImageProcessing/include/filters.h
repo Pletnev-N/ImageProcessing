@@ -4,4 +4,6 @@
 
 cv::Mat morphOpening(const cv::Mat& in, const cv::Mat& kernel);
 
+cv::Mat MedianFilter(const cv::Mat& mat, int radius);
+
 #endif  // FILTERS_H
