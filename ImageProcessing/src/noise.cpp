@@ -32,7 +32,6 @@ cv::Mat withRayleighNoise(const cv::Mat& in, double sigmaSq, uint noiseHist[256]
     noiseHist[noise]++;
     value = std::clamp(noise + value, 0, 255);
   });
-  std::cout << std::endl;
 
   for (size_t i = 0; i < 256; ++i) {
     noiseHist[i] = noiseHist[i];

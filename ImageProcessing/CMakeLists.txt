@@ -13,8 +13,15 @@ include_directories(include ${OpenCV_INCLUDE_DIRS})
 
 #set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(SOURCES src/main.cpp src/noise.cpp src/filters.cpp src/utils.cpp)
+set(SOURCES src/noise.cpp src/filters.cpp src/utils.cpp)
 set(HEADERS include/noise.h include/filters.h include/utils.h)
 
-add_executable(ImageProcessing ${SOURCES} ${HEADERS})
+add_executable(ImageProcessing src/main.cpp ${SOURCES} ${HEADERS})
 target_link_libraries(ImageProcessing PUBLIC ${OpenCV_LIBS})
+
+add_executable(procdir src/procdir.cpp ${SOURCES} ${HEADERS})
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  target_link_libraries(procdir PUBLIC ${OpenCV_LIBS} stdc++fs)
+else()
+  target_link_libraries(procdir PUBLIC ${OpenCV_LIBS})
+endif()
