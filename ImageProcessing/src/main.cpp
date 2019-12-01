@@ -7,6 +7,7 @@
 #include "noise.h"
 #include "filters.h"
 #include "utils.h"
+#include "transforms.h"
 
 
 
@@ -61,6 +62,24 @@ void lab1(const cv::Mat& image)
 }
 
 
+void lab3(const cv::Mat& image)
+{    
+    cv::Mat image_64f;
+    image.convertTo(image_64f, CV_64F);
+    image_64f /= 255;
+
+    std::vector<int> rows;
+    std::vector<int> cols;
+
+    cv::Mat wavelet = Wavelet(image_64f, 0, rows, cols);
+    cv::imshow("Wavelet transform", wavelet);
+
+    cv::Mat wavelet_reverse = WaveletReverse(wavelet, rows, cols);
+    cv::imshow("Reverse wavelet transform", wavelet_reverse);
+
+    std::cout << "SSIM(Reverse wavelet, gray) = " << getMSSIM(wavelet_reverse, image_64f) << std::endl;
+}
+
 
 //arg 1 - source image file
 int main(int argc, char **argv)
@@ -86,7 +105,10 @@ int main(int argc, char **argv)
   cv::cvtColor(image, gray, CV_BGR2GRAY);
   cv::imshow("Gray (press any key to continue)", gray);
 
-  lab1(gray);
+
+  lab3(gray);
+
+  //lab1(gray);
 
   cv::waitKey();
 
