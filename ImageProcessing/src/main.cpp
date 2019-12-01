@@ -78,6 +78,16 @@ void lab3(const cv::Mat& image)
     cv::imshow("Reverse wavelet transform", wavelet_reverse);
 
     std::cout << "SSIM(Reverse wavelet, gray) = " << getMSSIM(wavelet_reverse, image_64f) << std::endl;
+
+
+    int block_size = 16;
+    cv::Mat cosine = Cosine(image_64f, block_size);
+    cv::imshow("Cosine transform", cosine);
+
+    cv::Mat cosine_reverse = CosineReverse(cosine, block_size);
+    cv::imshow("Reverse cosine transform", cosine_reverse);
+
+    std::cout << "SSIM(Reverse cosine, gray) = " << getMSSIM(cosine_reverse, image_64f) << std::endl;
 }
 
 

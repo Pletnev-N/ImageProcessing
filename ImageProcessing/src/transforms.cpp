@@ -1,6 +1,10 @@
 #include "transforms.h"
 
 
+//==============================================================================
+//                             Wavelet transform
+//==============================================================================
+
 void WaveletRow(cv::Mat& mat, int row, int cols)
 {
     double* tmp = new double[cols];
@@ -147,3 +151,80 @@ cv::Mat WaveletReverse(const cv::Mat& mat, const std::vector<int>& rows_arr, con
     return res;
 }
 
+
+//==============================================================================
+//                             Cosine transform
+//==============================================================================
+
+double c(int i, int N)
+{
+    double res = 0;
+    if (i == 0) res = 1 / sqrt(2.0);
+    else res = 1;
+    return res;
+}
+
+cv::Mat Cosine(const cv::Mat& mat, int T)
+{
+    cv::Mat res = mat.clone();
+    double sum;
+
+    for (int i = 0; i < mat.cols; i++)
+    {
+        int iT = i % T;
+        double iTpi = iT * CV_PI;
+
+        for (int j = 0; j < mat.rows; j++)
+        {
+            int jT = j % T;
+            double jTpi = jT * CV_PI;
+            sum = 0;
+
+            for (int k = (i / T)*T; k < T*(i / T + 1); k++)
+            {
+                double cos1 = cos((2 * (k%T) + 1)*iTpi / (2 * T));
+                for (int l = (j / T)*T; l < T*(j / T + 1); l++)
+                {
+                    if ((k > -1) && (l > -1) && (k < mat.cols) && (l < mat.rows))
+                        sum += mat.at<double>(l, k) * cos1 * cos((2 * (l%T) + 1)*jTpi / (2 * T));
+                }
+            }
+
+            sum = sum * c(iT, T) * c(jT, T) * 2 / T;
+            res.at<double>(j, i) = sum;
+        }
+    }
+
+    return res;
+}
+
+cv::Mat CosineReverse(const cv::Mat& mat, int T)
+{
+    cv::Mat res = mat.clone();
+    double sum;
+
+    for (int i = 0; i < mat.cols; i++)
+    {
+        int iT = 2 * (i % T);
+
+        for (int j = 0; j < mat.rows; j++)
+        {
+            int jT = j % T;
+            sum = 0;
+
+            for (int k = (i / T)*T; k < T*(i / T + 1); k++)
+            {
+                double cos1 = cos((iT + 1)*(k%T)*CV_PI / (2 * T));
+                for (int l = (j / T)*T; l < T*(j / T + 1); l++)
+                {
+                    if ((k > -1) && (l > -1) && (k < mat.cols) && (l < mat.rows))
+                        sum += c(k%T, T) * c(l%T, T) * mat.at<double>(l, k) * cos1 * cos((2 * (jT)+1)*(l%T)*CV_PI / (2 * T));
+                }
+            }
+            sum = sum * 2 / T;
+            res.at<double>(j, i) = sum;
+        }
+    }
+
+    return res;
+}
