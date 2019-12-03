@@ -54,3 +54,26 @@ double getMSSIM( const Mat& i1, const Mat& i2)
 
  return  mean( ssim_map )[0]; // mssim = average of ssim map
 }
+
+
+
+cv::Mat AlignImage(const cv::Mat& mat, int align_to)
+{
+    int rows_new = mat.rows, cols_new = mat.cols;
+
+    if (mat.rows % align_to != 0)
+        rows_new = mat.rows + align_to - mat.rows % align_to;
+    if (mat.cols % align_to != 0)
+        cols_new = mat.cols + align_to - mat.cols % align_to;
+
+    cv::Mat res(rows_new, cols_new, mat.type(), Scalar(0));
+
+    mat.copyTo(res(cv::Rect(0, 0, mat.cols, mat.rows)));
+
+    return res;
+}
+
+cv::Mat DiscardAlignment(const cv::Mat& mat, int rows, int cols)
+{
+    return mat(cv::Rect(0, 0, cols, rows));
+}

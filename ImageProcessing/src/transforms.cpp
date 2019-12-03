@@ -185,8 +185,7 @@ cv::Mat Cosine(const cv::Mat& mat, int T)
                 double cos1 = cos((2 * (k%T) + 1)*iTpi / (2 * T));
                 for (int l = (j / T)*T; l < T*(j / T + 1); l++)
                 {
-                    if ((k > -1) && (l > -1) && (k < mat.cols) && (l < mat.rows))
-                        sum += mat.at<double>(l, k) * cos1 * cos((2 * (l%T) + 1)*jTpi / (2 * T));
+                    sum += mat.at<double>(l, k) * cos1 * cos((2 * (l%T) + 1)*jTpi / (2 * T));
                 }
             }
 
@@ -217,8 +216,7 @@ cv::Mat CosineReverse(const cv::Mat& mat, int T)
                 double cos1 = cos((iT + 1)*(k%T)*CV_PI / (2 * T));
                 for (int l = (j / T)*T; l < T*(j / T + 1); l++)
                 {
-                    if ((k > -1) && (l > -1) && (k < mat.cols) && (l < mat.rows))
-                        sum += c(k%T, T) * c(l%T, T) * mat.at<double>(l, k) * cos1 * cos((2 * (jT)+1)*(l%T)*CV_PI / (2 * T));
+                    sum += c(k%T, T) * c(l%T, T) * mat.at<double>(l, k) * cos1 * cos((2 * (jT)+1)*(l%T)*CV_PI / (2 * T));
                 }
             }
             sum = sum * 2 / T;
