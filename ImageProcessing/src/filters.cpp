@@ -70,7 +70,7 @@ cv::Mat MedianFilter(const cv::Mat& mat, int radius)
                 {
                     windows_pixels.push_back(mat.at<uchar>(std::clamp(i + k, 0, mat.rows - 1), std::clamp(j + l, 0, mat.cols - 1)));
                 }
-            
+
             std::sort(windows_pixels.begin(), windows_pixels.end());
             if (windows_pixels.size() % 2 == 0)
             {
@@ -85,4 +85,26 @@ cv::Mat MedianFilter(const cv::Mat& mat, int radius)
         }
 
     return res;
+}
+
+
+cv::Mat LowPassForDCTBlockSize(const cv::Mat& cosine, int T, int low_pass_T) {
+  cv::Mat res = cv::Mat::zeros(cosine.size(), cosine.type());
+
+  for (int i = 0; i < cosine.cols; i += T)
+  {
+      for (int j = 0; j < cosine.rows; j += T)
+      {
+          cosine(cv::Rect(i, j, low_pass_T, low_pass_T))
+            .copyTo(res(cv::Rect(i, j, low_pass_T, low_pass_T)));
+      }
+  }
+
+  return res;
+}
+
+cv::Mat ThresholdFilterForDCT(const cv::Mat& cosine, double threshold) {
+  cv::Mat res = cosine.clone();
+  res.setTo(0.0, cv::abs(cosine) < threshold);
+  return res;
 }

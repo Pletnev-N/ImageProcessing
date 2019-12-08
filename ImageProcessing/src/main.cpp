@@ -63,7 +63,7 @@ void lab1(const cv::Mat& image)
 
 
 void lab3(const cv::Mat& image)
-{    
+{
     cv::Mat image_64f;
     image.convertTo(image_64f, CV_64F);
     image_64f /= 255;
@@ -82,6 +82,8 @@ void lab3(const cv::Mat& image)
 
     int block_size = 16;
     cv::Mat cosine = Cosine(AlignImage(image_64f, block_size), block_size);
+
+    cosine = ThresholdFilterForDCT(cosine, 0.1);
     cv::imshow("Cosine transform", cosine);
 
     cv::Mat cosine_reverse = DiscardAlignment(CosineReverse(cosine, block_size), image_64f.rows, image_64f.cols);
