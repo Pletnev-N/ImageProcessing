@@ -83,13 +83,53 @@ void lab3(const cv::Mat& image)
     int block_size = 16;
     cv::Mat cosine = Cosine(AlignImage(image_64f, block_size), block_size);
 
-    cosine = ThresholdFilterForDCT(cosine, 0.1);
     cv::imshow("Cosine transform", cosine);
 
     cv::Mat cosine_reverse = DiscardAlignment(CosineReverse(cosine, block_size), image_64f.rows, image_64f.cols);
     cv::imshow("Reverse cosine transform", cosine_reverse);
 
     std::cout << "SSIM(Reverse cosine, gray) = " << getMSSIM(cosine_reverse, image_64f) << std::endl;
+}
+
+
+void lab3_denoise(const cv::Mat& image)
+{
+    cv::Mat gamma;
+    gamma = GammaNoise(image, 2.0, 5.0);
+
+    std::cout << "SSIM(Gamma, gray) = " << getMSSIM(gamma, image) << std::endl;
+
+    cv::Mat image_64f_gamma;
+    gamma.convertTo(image_64f_gamma, CV_64F);
+    image_64f_gamma /= 255;
+
+    cv::imshow("Gamma Noise", image_64f_gamma);
+
+    //==============   DCT  =======================
+    int block_size = 8;
+    cv::Mat cosine = Cosine(AlignImage(image_64f_gamma, block_size), block_size);
+
+    cosine = ThresholdFilterForDCT(cosine, 0.1);
+
+    cv::Mat cosine_reverse = DiscardAlignment(CosineReverse(cosine, block_size), image_64f_gamma.rows, image_64f_gamma.cols);
+    cv::imshow("Reverse cosine transform", cosine_reverse);
+
+    cosine_reverse.convertTo(cosine_reverse, CV_8UC1, 255);
+    std::cout << "SSIM(Reverse cosine, gray) = " << getMSSIM(cosine_reverse, image) << std::endl;
+
+
+    //==============  Wavelet  ====================
+    std::vector<int> rows;
+    std::vector<int> cols;
+    cv::Mat wavelet = Wavelet(image_64f_gamma, 0, rows, cols);
+    
+    wavelet = WaveletDenoise(wavelet, 3, 0.1);
+
+    cv::Mat wavelet_reverse = WaveletReverse(wavelet, rows, cols);
+    cv::imshow("Reverse wavelet transform", wavelet_reverse);
+
+    wavelet_reverse.convertTo(wavelet_reverse, CV_8UC1, 255);
+    std::cout << "SSIM(Reverse wavelet, gray) = " << getMSSIM(wavelet_reverse, image) << std::endl;
 }
 
 
@@ -118,7 +158,9 @@ int main(int argc, char **argv)
   cv::imshow("Gray (press any key to continue)", gray);
 
 
-  lab3(gray);
+  //lab3(gray);
+
+  lab3_denoise(gray);
 
   //lab1(gray);
 

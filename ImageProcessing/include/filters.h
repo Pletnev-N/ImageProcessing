@@ -9,4 +9,6 @@ cv::Mat MedianFilter(const cv::Mat& mat, int radius);
 cv::Mat LowPassForDCTBlockSize(const cv::Mat& cosine, int T, int low_pass_T);
 cv::Mat ThresholdFilterForDCT(const cv::Mat& cosine, double threshold);
 
+cv::Mat WaveletDenoise(const cv::Mat& mat, int depth, double t);
+
 #endif  // FILTERS_H

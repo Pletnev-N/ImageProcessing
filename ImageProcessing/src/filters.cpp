@@ -108,3 +108,58 @@ cv::Mat ThresholdFilterForDCT(const cv::Mat& cosine, double threshold) {
   res.setTo(0.0, cv::abs(cosine) < threshold);
   return res;
 }
+
+
+cv::Mat WaveletDenoise(const cv::Mat& mat, int depth, double t)
+{
+    cv::Mat res = mat.clone();
+
+    int rows = res.rows;
+    int cols = res.cols;
+
+    for (int i = 0; i < depth; i++)
+    {
+        int roi_start_row = (rows / 2) + (rows % 2);
+        int roi_start_col = (cols / 2) + (cols % 2);
+
+        int roi_rows = rows - roi_start_row;
+        int roi_cols = cols - roi_start_col;
+
+        //right bottom
+        for (int i = roi_start_row; i < rows; i++)
+        {
+            for (int j = roi_start_col; j < cols; j++)
+            {
+                if (abs(res.at<double>(i, j)) < t)
+                    res.at<double>(i, j) = 0;
+            }
+        }
+
+        //left bottom
+        for (int i = roi_start_row; i < rows; i++)
+        {
+            for (int j = 0; j < roi_start_col; j++)
+            {
+                if (abs(res.at<double>(i, j)) < t / 2)
+                    res.at<double>(i, j) = 0;
+            }
+        }
+
+        //right top
+        for (int i = 0; i < roi_start_row; i++)
+        {
+            for (int j = roi_start_col; j < cols; j++)
+            {
+                if (abs(res.at<double>(i, j)) < t / 2)
+                    res.at<double>(i, j) = 0;
+            }
+        }
+
+        rows = (rows / 2) + (rows % 2);
+        cols = (cols / 2) + (cols % 2);
+
+        t = t / 4;
+    }
+
+    return res;
+}
