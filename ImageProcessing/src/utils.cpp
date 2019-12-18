@@ -1,3 +1,4 @@
+#include <fstream>
 #include "utils.h"
 
 using namespace cv;
@@ -76,4 +77,20 @@ cv::Mat AlignImage(const cv::Mat& mat, int align_to)
 cv::Mat DiscardAlignment(const cv::Mat& mat, int rows, int cols)
 {
     return mat(cv::Rect(0, 0, cols, rows));
+}
+
+
+// elem_size - size of mat element in bytes
+void WriteFile(const cv::Mat& mat, std::string name, int elem_size)
+{
+    std::ofstream fout(name, std::ios::out | std::ios::binary | std::ios::trunc);
+    fout.write((char*)(mat.data), mat.rows * mat.cols * elem_size);
+    fout.close();
+}
+
+void ReadFile(cv::Mat& mat, std::string name, int elem_size)
+{
+    std::ifstream fin(name, std::ios::in | std::ios::binary);
+    fin.read((char*)(mat.data), mat.rows * mat.cols * elem_size);
+    fin.close();
 }
